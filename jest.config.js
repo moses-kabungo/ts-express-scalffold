@@ -4,5 +4,6 @@ module.exports = {
     ],
     transform: {
         "^.+\\.tsx?$": "ts-jest"
-    }
+    },
+    setupFiles: ["<rootDir>/tests/bootstrap-tests.ts"]
 };
