@@ -1,15 +1,22 @@
 import { Router } from 'express';
 
-import { createUser } from './_users.create';
+import { UsersResource } from './_users.resource';
 import { IUsersService } from '../../services';
 
 
 const users = Router();
 
-export function UsersApi(config: { usersService: IUsersService }) {
+export class UsersApi {
 
-    // Create new users
-    users.post('/', createUser(config));
+    constructor(private usersService: IUsersService) {}
 
-    return users;
+    init() {
+        const usersResource = new UsersResource(this.usersService);
+        // Create new users
+        users.post('/', usersResource.create.bind(usersResource));
+        // Get user by id
+        users.get('/:id', usersResource.getById.bind(usersResource));
+
+        return users;
+    }
 };
