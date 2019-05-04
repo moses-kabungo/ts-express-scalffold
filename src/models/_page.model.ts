@@ -1,72 +1,71 @@
 import * as querystring from 'querystring';
 import { PaginationInfo } from "../middlewares/paginator";
+import { assert } from '../utils';
 
 export class Page<T> {
 
     constructor(
-        public page: number,
-        public pagesCount: number,
-        public itemsCount: number,
+        public pi: number,
+        public pc: number,
+        public ps: number,
+        public total: number,
         public hasPrev: boolean,
         public hasNext: boolean,
-        public nextPage: string|null,
-        public prevPage: string|null,
+        public nextPage: string | null,
+        public prevPage: string | null,
         public items: T[]
     ) {}
 }
 
 export class PageBuilder<T> {
 
-    constructor(private page: Page<T>) {}
+    constructor(private page: Page<T>, private pageInfo: PaginationInfo) {}
 
     static withPageInfo<T>(pageInfo: PaginationInfo, items: T[]) {
-        const page = pageInfo.page;
-        const totalCount: number = pageInfo.totalCount;
-        const count = Math.ceil(totalCount / pageInfo.limit);
-        const hasNext = page < count;
-        const hasPrev = page > 1;
-        const sortBy = pageInfo.sortBy;
-        const sortOrder = pageInfo.sortOrder;
-        let nextPage: string = '';
-        let prevPage: string = '';
-
-        const params = { page, pageSize: pageInfo.limit, sortBy, sortOrder };
-
-        if (!pageInfo.sortBy) {
-            delete params.sortBy;
-            delete params.sortOrder;
-        } else {
-            params.sortBy = pageInfo.sortBy;
-            params.sortOrder = pageInfo.sortOrder ? pageInfo.sortOrder : 'desc';
-        }
-
-        if ( hasNext ) {
-            params.page += 1;
-            const qs = querystring.stringify(params);
-            nextPage = pageInfo.url + "?" + qs;
-        }
-        
-        if (hasPrev) {
-            params.page -= 1;
-            const qs = querystring.stringify(params);
-            prevPage = pageInfo.url + "?" + qs;
-        }
+        const pi = pageInfo.pi;
+        const total: number = NaN;
+        const pc = NaN;
+        const ps = pageInfo.ps;
+        const hasNext = false
+        const hasPrev = pi > 1;
 
         const _page = new Page<T>(
-            page,
-            count,
-            totalCount,
-            hasPrev,
-            hasNext,
-            (nextPage.length ? nextPage : null),
-            (prevPage.length ? prevPage : null),
-            items
+            pi, pc, ps, total, hasPrev, hasNext, null, null, items
         );
 
-        return new PageBuilder(_page);
+        return new PageBuilder(_page, pageInfo);
+    }
+
+    totalCount(total: number) {
+        this.page.total = total;
+        return this;
     }
 
     build() {
+        assert(!isNaN(this.page.total), "needs to know total number of items");
+
+        this.page.pc = Math.ceil(this.page.total / this.page.ps);
+        this.page.hasNext = this.page.pi < this.page.pc;
+        this.page.hasPrev = this.page.pi > 1;
+        
+        const sortBy = this.pageInfo.sortBy;
+        const sortOrder = this.pageInfo.sortOrder;
+        
+        const params = { pi: this.page.pi, ps: this.page.ps, sortBy, sortOrder };
+
+        if ( this.page.hasPrev ) {
+            const prevParams = JSON.parse(JSON.stringify(params));
+            prevParams.pi -= 1;
+            const qs = querystring.stringify(prevParams);
+            this.page.prevPage = this.pageInfo.url + "?" + qs;
+        }
+
+        if ( this.page.hasNext ) {
+            const nextParams = JSON.parse(JSON.stringify(params));
+            nextParams.pi += 1;
+            const qs = querystring.stringify(nextParams);
+            this.page.nextPage = this.pageInfo.url + "?" + qs;
+        }
         return this.page;
     }
 }
