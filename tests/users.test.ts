@@ -34,14 +34,14 @@ class MockUsersService implements IUsersService {
     async findPage(pageInfo: PaginationInfo): Promise<Page<User>> {
         try {
             const totalCount = await this.count();
-            pageInfo.totalCount = totalCount;
             
             const items: User[] = Array
                 .from(this.users.values())
-                .slice(pageInfo.offset, pageInfo.limit);
+                .slice(pageInfo.offset, pageInfo.ps);
             
             return Promise.resolve(
                 PageBuilder.withPageInfo(pageInfo, items)
+                .totalCount(totalCount)
                 .build()
             );
         } catch (err) {
