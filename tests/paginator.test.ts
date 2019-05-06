@@ -1,4 +1,4 @@
-import { PaginationInfo, paginator } from "../src/middlewares/paginator";
+import { PaginationInfo, paginator } from "../src/middlewares/_paginator.middleware";
 import { PageBuilder, Page } from "../src/models";
 
 describe('paginator', () => {
