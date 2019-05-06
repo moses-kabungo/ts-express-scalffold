@@ -1,5 +1,5 @@
 import * as querystring from 'querystring';
-import { PaginationInfo } from "../middlewares/paginator";
+import { PaginationInfo } from "../middlewares/_paginator.middleware";
 import { assert } from '../utils';
 
 export class Page<T> {
