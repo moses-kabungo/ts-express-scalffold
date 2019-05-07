@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { IUsersService } from '../../services';
 import { User } from '../../models';
 import { LoginFail } from '../../models/_login-response.model';
+import { PaginationInfo } from '../../middlewares';
 
 /**
  * Users resource. 
@@ -22,6 +23,7 @@ export class UsersResource {
 
     /**
      * Create new `User` resource.
+     * 
      * @param {Request} req express.Request instance allows the method to access request
      *  context information such as url, method, headers e.t.c.
      * @param {Response} res express.Response instance allow the method to respond to the
@@ -39,6 +41,28 @@ export class UsersResource {
             const data = await this.usersService.create(user);
             res.json(data);
         } catch (err) {
+            next(err);
+        }
+    }
+
+    /**
+     * Performs bulk creation of user resource items.
+     * 
+     * @param {Request} req express.Request instance allows the method to access request
+     *  context information such as url, method, headers e.t.c.
+     * @param {Response} res express.Response instance allow the method to respond to the
+     * requested action.
+     * @param {NextFunction} next invoke next middleware in the chain e.g. when you need to
+     * process errors
+     */
+    async bulkCreate(req: Request, res: Response, next: NextFunction) {
+        try {
+            const users = req.body as User[];
+            // insert all users into the database
+            const result = await this.usersService.bulkCreate(users);
+            res.json(result);
+        } catch (err) {
+            console.error(err);
             next(err);
         }
     }
@@ -103,12 +127,34 @@ export class UsersResource {
                 });
             }
 
-            console.error(err);
-
             // pass-down unknown error
             next(err);
         }
     }
+
+    /**
+     * Get a page of users. For the page to be returned, this method must be precided
+     * with the paginator middleware in order to construct pagination details
+     * 
+     * @param {Request} req express.Request instance allows the method to access request
+     *  context information such as url, method, headers e.t.c.
+     * @param {Response} res express.Response instance allow the method to respond to the
+     * requested action.
+     * @param {NextFunction} next invoke next middleware in the chain e.g. when you need to
+     * process errors
+     */
+    async getPage(req: Request, res: Response, next: NextFunction) {
+        const paginationInfo: PaginationInfo = req.query.paginationInfo;
+        try {
+            const page = await this.usersService
+                .findPage(paginationInfo);
+            res.json(page);
+        } catch (err) {
+            console.error(err);
+            next(err);
+        }
+    }
+
 
     /**
      * Perform logout. Successful logout should clear user data from the cache.
@@ -124,7 +170,7 @@ export class UsersResource {
         const { id } = req.params;
         try {
             const successful = await this.usersService.logout(id);
-            res.status(successful ? 200 : 500).json({ successful });
+            res.status(successful ? 200 : 500).json({ successful })
         } catch (err) {
             next(err);
         }
