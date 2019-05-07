@@ -16,6 +16,10 @@ export class UsersApi {
         users.post('/', usersResource.create.bind(usersResource));
         // Get user by id
         users.get('/:id', usersResource.getById.bind(usersResource));
+        // login user
+        users.post('/auth', usersResource.doLogin.bind(usersResource));
+        // logout user
+        users.post('/:id/logout', usersResource.doLogout.bind(usersResource));
 
         return users;
     }

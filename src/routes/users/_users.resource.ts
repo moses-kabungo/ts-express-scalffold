@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 
 import { IUsersService } from '../../services';
 import { User } from '../../models';
+import { LoginFail } from '../../models/_login-response.model';
 
 /**
  * Users resource. 
@@ -67,6 +68,63 @@ export class UsersResource {
                 });
             }
             res.json(user);
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    /**
+     * Perform login. Successful login should cache user data into the cache
+     * until when user decides to logout.
+     * 
+     * @param {Request} req express.Request instance allows the method to access request
+     *  context information such as url, method, headers e.t.c.
+     * @param {Response} res express.Response instance allow the method to respond to the
+     * requested action.
+     * @param {NextFunction} next invoke next middleware in the chain e.g. when you need to
+     * process errors
+     */
+    async doLogin(
+        req: Request,
+        res: Response,
+        next: NextFunction) {
+        const { loginId, password } = req.body;
+
+        try {
+            const loginResponse = await this.usersService
+                .login(loginId, password);
+            // return login response
+            res.json(loginResponse);
+        } catch (err) {
+
+            if (err instanceof LoginFail) {
+                return res.status(err.code).json({
+                    error: err.message
+                });
+            }
+
+            console.error(err);
+
+            // pass-down unknown error
+            next(err);
+        }
+    }
+
+    /**
+     * Perform logout. Successful logout should clear user data from the cache.
+     * 
+     * @param {Request} req express.Request instance allows the method to access request
+     *  context information such as url, method, headers e.t.c.
+     * @param {Response} res express.Response instance allow the method to respond to the
+     * requested action.
+     * @param {NextFunction} next invoke next middleware in the chain e.g. when you need to
+     * process errors
+     */
+    async doLogout(req: Request, res: Response, next: NextFunction) {
+        const { id } = req.params;
+        try {
+            const successful = await this.usersService.logout(id);
+            res.status(successful ? 200 : 500).json({ successful });
         } catch (err) {
             next(err);
         }
