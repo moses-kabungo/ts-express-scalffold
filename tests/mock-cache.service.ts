@@ -1,7 +1,5 @@
 import { ICacheService } from "../src/services/_cache.service";
 
-const parse   = JSON.parse;
-const resolve = Promise.resolve;
 
 export class MockCacheService implements ICacheService {
 
@@ -13,29 +11,29 @@ export class MockCacheService implements ICacheService {
 
     set(key: string, value: any): Promise<boolean> {
         this.items.set(key, JSON.stringify(value));
-        return resolve(true);
+        return Promise.resolve(true);
     } 
     
     get(key: string): Promise<any|undefined> {
         const value = this.items.get(key);
-        return resolve(value === undefined ? undefined : parse(String(value)));
+        return Promise.resolve(value === undefined ? undefined : JSON.parse(String(value)));
     }
 
     has(key: string): Promise<boolean> {
-        return resolve(this.items.has(key));
+        return Promise.resolve(this.items.has(key));
     }
 
     delete(key: string): Promise<boolean> {
         return this.has(key).then(exists => exists
-                ? resolve(this.items.delete(key))
-                : resolve(false));
+                ? Promise.resolve(this.items.delete(key))
+                : Promise.resolve(false));
     }
 
     deleteAll(): Promise<boolean> {
         this.items.clear();
-        return resolve(true);
+        return Promise.resolve(true);
     }
     size(): Promise<number> {
-        return resolve(this.items.size);
+        return Promise.resolve(this.items.size);
     }
 }

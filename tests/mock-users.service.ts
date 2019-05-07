@@ -6,31 +6,37 @@ import { IUsersService } from "../src/services";
 import { ICacheService } from "../src/services/_cache.service";
 import { LoginResponse, LoginFail } from "../src/models/_login-response.model";
 
-const resolve = Promise.resolve;
-const reject  = Promise.reject;
-
 export class MockUsersService implements IUsersService {
 
-    private users: Map<string, User>;
+    public users: Map<string, User>;
 
     constructor(private cacheService: ICacheService) {
         this.users = new Map();
     }
 
     count(): Promise<number> {
-        return resolve(this.users.size);
+        return Promise.resolve(this.users.size);
+    }
+
+    bulkCreate(users: User[]): Promise<(string|User)[]> {
+        const result = Promise.resolve(users.map(user => {
+            this.users.set(user.id, user);
+            return user;
+        }));
+
+        return result;
     }
 
     create(user: User): Promise<string | User> {
         this.users.set(user.id, user);
-        return resolve(user);
+        return Promise.resolve(user);
     }
 
     findById(id: string): Promise<User | undefined> {
         const exists = this.users.has(id);
         return exists
-            ? resolve(this.users.get(id))
-            : reject(new Error(`No Such User ID: ${id}`));
+            ? Promise.resolve(this.users.get(id))
+            : Promise.reject(new Error(`No Such User ID: ${id}`));
     }
 
     jwtEncode(user: User): Promise<string> {
@@ -56,12 +62,12 @@ export class MockUsersService implements IUsersService {
         // Inspect parameters validity
         // If no login ID, return 400 (Invalid Request)
         if (!loginId) {
-            return reject(new LoginFail('Missing login id', 400));
+            return Promise.reject(new LoginFail('Missing login id', 400));
         }
 
         // If no password, return 400 (Invalid Request)
         if (!password) {
-            return reject(new LoginFail('Missing password', 400));
+            return Promise.reject(new LoginFail('Missing password', 400));
         }
 
         // Check if our user exists
@@ -73,11 +79,11 @@ export class MockUsersService implements IUsersService {
         );
 
         if (index === -1) {
-            return reject(new LoginFail('Invalid username', 404));
+            return Promise.reject(new LoginFail('Invalid username', 404));
         }
 
         if (users[index][1].password !== password) {
-            return reject(new LoginFail('Invalid password', 400));
+            return Promise.reject(new LoginFail('Invalid password', 400));
         }
 
         return this.jwtEncode(users[index][1]).then(token => {
@@ -94,14 +100,43 @@ export class MockUsersService implements IUsersService {
 
     findPage(pageInfo: PaginationInfo): Promise<Page<User>> {
         return this.count().then(totalCount => {
-            const items: User[] = Array
-                .from(this.users.values())
+
+            let items: User[] = Array.from(this.users.values());
+            // sort if necessary
+            if (pageInfo.sortBy && pageInfo.sortOrder) {
+                items = items.sort((user1, user2) => {
+                    if (pageInfo.sortOrder === 'asc') {
+                        if (user1.name < user2.name) {
+                            return -1;
+                        }
+
+                        if (user1.name > user2.name) {
+                            return 1;
+                        }
+
+                        return 0;
+                    } else {
+                        if (user1.name < user2.name) {
+                            return 1;
+                        }
+
+                        if (user1.name > user2.name) {
+                            return -1;
+                        }
+
+                        return 0;
+                    }
+                });
+            }
+
+            const ret: User[] = items
                 .slice(pageInfo.offset, pageInfo.ps);
+
             const usersPage: Page<User> = PageBuilder
-                .withPageInfo(pageInfo, items)
+                .withPageInfo(pageInfo, ret)
                 .totalCount(totalCount)
                 .build();
             return usersPage;
-        }).catch(err => reject(err));
+        }).catch(err => Promise.reject(err));
     }
 }
