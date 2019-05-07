@@ -1,10 +1,16 @@
 import { User } from "./_user.model";
 
-export interface AccessTokenPayload {
+export interface LoginSuccess {
     accessToken: string;
 }
 
-export type LoginResponse = AccessTokenPayload
+export class LoginFail extends Error {
+    constructor(public message: string, public code: number) {
+        super(message);
+    }
+};
+
+export type LoginResponse = LoginSuccess
     | User
-    | AccessTokenPayload & User
-    | undefined;
+    | LoginSuccess & User
+    | LoginFail
