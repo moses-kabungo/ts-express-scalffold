@@ -6,6 +6,7 @@ import { LoginResponse } from '../models/_login-response.model';
 
 export interface IUsersService {
     create(user: User): Promise<string|User>;
+    bulkCreate(users: User[]): Promise<(string|User)[]>;
     count(): Promise<number>;
     jwtEncode(user: User): Promise<string>;
     jwtDecode(token: string): Promise<User|undefined>;
