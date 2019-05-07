@@ -57,14 +57,14 @@ export class PageBuilder<T> {
             const prevParams = JSON.parse(JSON.stringify(params));
             prevParams.pi -= 1;
             const qs = querystring.stringify(prevParams);
-            this.page.prevPage = this.pageInfo.url + "?" + qs;
+            this.page.prevPage = this.pageInfo.url.replace(/\?.*/, '') + "?" + qs;
         }
 
         if ( this.page.hasNext ) {
             const nextParams = JSON.parse(JSON.stringify(params));
             nextParams.pi += 1;
             const qs = querystring.stringify(nextParams);
-            this.page.nextPage = this.pageInfo.url + "?" + qs;
+            this.page.nextPage = this.pageInfo.url.replace(/\?.*/, '') + "?" + qs;
         }
         return this.page;
     }
