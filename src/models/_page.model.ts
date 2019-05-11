@@ -42,7 +42,7 @@ export class PageBuilder<T> {
     }
 
     build() {
-        assert(!isNaN(this.page.total), "needs to know total number of items");
+        assert(!isNaN(this.page.total), "need to know total number of items");
 
         this.page.pc = Math.ceil(this.page.total / this.page.ps);
         this.page.hasNext = this.page.pi < this.page.pc;
