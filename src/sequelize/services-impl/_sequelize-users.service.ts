@@ -3,10 +3,11 @@ import { User, Page, PageBuilder } from "../../models";
 import { PaginationInfo } from "../../middlewares";
 import { LoginResponse } from "../../models/_login-response.model";
 import { SequelizeUser } from "../models-impl/_sequelize-user.model";
+import { ICacheService } from "../../services/_cache.service";
 
 export class SequelizeUsersService implements IUsersService {
 
-    constructor() { }
+    constructor(private cache: ICacheService) { }
 
     create(user: User): Promise<string | User> {
         try {
@@ -80,14 +81,11 @@ export class SequelizeUsersService implements IUsersService {
             // check if password is valid
             if (validator(user.password, password)) {
                 const accessToken = await this.jwtEncode(user);
-
-                // TODO: add token to the cache
-
+                await this.cache.set('' + user.id, user);
                 return Promise.resolve({
                     accessToken
                 });
             }
-
             // reject because password is invalid
             return Promise.reject(new Error("Invalid password"));
         } catch (err) {
@@ -96,8 +94,7 @@ export class SequelizeUsersService implements IUsersService {
     }
 
     logout(userId: string): Promise<boolean> {
-        // TODO: remove user from the cache
-        throw new Error("Method not implemented.");
+        return this.cache.delete(userId);
     }
 
 }
