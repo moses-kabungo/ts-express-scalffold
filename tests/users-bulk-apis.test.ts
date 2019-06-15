@@ -14,52 +14,52 @@ describe('Mock bulk create users', () => {
     let cacheService: ICacheService;
     const app = express();
     const users: User[] = [{
-        id: '2',
+        id: 2,
         name: 'Sally',
         email: 'sally@example.com',
         password: 'sally1990'
     }, {
-        id: '3',
+        id: 3,
         name: 'Doto',
         email: 'doto@example.com',
         password: 'doto1998'
     }, {
-        id: '4',
+        id: 4,
         name: 'Tom',
         email: 'tom@example.com',
         password: 'tom2001'
     }, {
-        id: '5',
+        id: 5,
         name: 'Sembe',
         email: 'sembe@example.com',
         password: 'sembe1990'
     }, {
-        id: '6',
+        id: 6,
         name: 'Diana',
         email: 'diana@example.com',
         password: 'diana1990'
     }, {
-        id: '7',
+        id: 7,
         name: 'Cece',
         email: 'cece@example.com',
         password: 'cece1990'
     }, {
-        id: '8',
+        id: 8,
         name: 'Kiboko',
         email: 'kiboko@example.com',
         password: 'kiboko1990'
     }, {
-        id: '9',
+        id: 9,
         name: 'Namba 1',
         email: 'namba@example.com',
         password: 'namba1990'
     }, {
-        id: '10',
+        id: 10,
         name: 'Ombeni',
         email: 'ombeni@example.com',
         password: 'ombeni1990'
     }, {
-        id: '11',
+        id: 11,
         name: 'Mombeki',
         email: 'mombeki@example.com',
         password: 'mombeki1990'
