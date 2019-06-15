@@ -8,14 +8,9 @@ export type RestPath = { methods: string[], path: RegExp };
 export type RestPaths = RestPath[];
 export type MiddlewareFn = (req: Request, res: Response, next: NextFunction) => void;
 
-const noop = (req: Request, res: Response, next: NextFunction) => {
-    next();
-};
-
 export class RestPathsMatcher {
 
     private unprotectedPaths: RestPaths = []
-    private middlewareFn: MiddlewareFn = noop;
 
     constructor() { }
 
@@ -30,6 +25,5 @@ export class RestPathsMatcher {
     }
 
     onMatchFound(middlewareFn: MiddlewareFn) {
-        this.middlewareFn = middlewareFn;
     }
 }

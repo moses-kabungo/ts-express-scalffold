@@ -20,7 +20,7 @@ export class MockUsersService implements IUsersService {
 
     bulkCreate(users: User[]): Promise<(string|User)[]> {
         const result = Promise.resolve(users.map(user => {
-            this.users.set(user.id, user);
+            this.users.set(String(user.id), user);
             return user;
         }));
 
@@ -28,14 +28,14 @@ export class MockUsersService implements IUsersService {
     }
 
     create(user: User): Promise<string | User> {
-        this.users.set(user.id, user);
+        this.users.set(String(user.id), user);
         return Promise.resolve(user);
     }
 
-    findById(id: string): Promise<User | undefined> {
+    findById(id: string): Promise<User | null> {
         const exists = this.users.has(id);
         return exists
-            ? Promise.resolve(this.users.get(id))
+            ? Promise.resolve(this.users.get(id) as User)
             : Promise.reject(new Error(`No Such User ID: ${id}`));
     }
 
@@ -49,7 +49,7 @@ export class MockUsersService implements IUsersService {
         });
     }
 
-    jwtDecode(token: string): Promise<User | undefined> {
+    jwtDecode(token: string): Promise<User | null> {
         return new Promise((_, reject) => {
             const data: { id: string } | null = jwt.decode(token) as any;
             if (data == null)
@@ -88,7 +88,7 @@ export class MockUsersService implements IUsersService {
 
         return this.jwtEncode(users[index][1]).then(token => {
             // add to the cache
-            this.cacheService.set(users[index][1].id, users[index][1]);
+            this.cacheService.set(String(users[index][1].id), users[index][1]);
             return { accessToken: token };
         });
     }

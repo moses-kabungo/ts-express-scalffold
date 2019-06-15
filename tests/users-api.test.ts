@@ -10,7 +10,7 @@ import { ICacheService } from '../src/services/_cache.service';
 import { MockCacheService } from './mock-cache.service';
 
 const payload: User = {
-    id: '1',
+    id: 1,
     name: 'Jason',
     email: 'jason@example.com',
     password: 'very-secret'
@@ -74,7 +74,7 @@ describe('Users API', () => {
             .expect(async (response) => {
                 expect(response.status).toEqual(200);
                 expect(response.body.accessToken).toBeDefined();
-                expect(await cacheService.get(payload.id)).toEqual(payload);
+                expect(await cacheService.get(String(payload.id))).toEqual(payload);
             });
     });
 
@@ -134,7 +134,7 @@ describe('Users API', () => {
             .expect(async (response) => {
                 expect(response.status).toEqual(200);
                 expect(response.body.successful).toBe(true);
-                expect(await cacheService.get(payload.id)).toBeUndefined();
+                expect(await cacheService.get(String(payload.id))).toBeUndefined();
             });
     });
 

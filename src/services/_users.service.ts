@@ -5,13 +5,17 @@ import { LoginResponse } from '../models/_login-response.model';
 
 
 export interface IUsersService {
-    create(user: User): Promise<string|User>;
+    create(user: User): Promise<number|string|User>;
     bulkCreate(users: User[]): Promise<(string|User)[]>;
     count(): Promise<number>;
     jwtEncode(user: User): Promise<string>;
-    jwtDecode(token: string): Promise<User|undefined>;
-    findById(id: string): Promise<User|undefined>;
+    jwtDecode(token: string): Promise<User|null>;
+    findById(id: string|number): Promise<User|null>;
     findPage(pageInfo: PaginationInfo): Promise<Page<User>>;
-    login(loginId: string, password: string): Promise<LoginResponse>;
+    login(
+        loginId: string,
+        password: string,
+        validator: (hash: string, pwd: string) => Promise<boolean>
+    ): Promise<LoginResponse>;
     logout(userId: string): Promise<boolean>;
 }
