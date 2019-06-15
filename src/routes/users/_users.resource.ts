@@ -5,6 +5,8 @@ import { User } from '../../models';
 import { LoginFail } from '../../models/_login-response.model';
 import { PaginationInfo } from '../../middlewares';
 
+import * as bcrypt from 'bcrypt';
+
 /**
  * Users resource. 
  */
@@ -116,7 +118,7 @@ export class UsersResource {
 
         try {
             const loginResponse = await this.usersService
-                .login(loginId, password);
+                .login(loginId, password, bcrypt.compare.bind(bcrypt));
             // return login response
             res.json(loginResponse);
         } catch (err) {
