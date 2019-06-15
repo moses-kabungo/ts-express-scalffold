@@ -11,10 +11,9 @@ export class SequelizeUsersService extends AbstractUsersService {
 
     constructor(
         private cache: ICacheService,
-        public tokenEncoder: TokenEncoder<User>,
-        public tokenDecoder: TokenDecoder<User>
+        public tokenVerifier: TokenEncoder<User> & TokenDecoder<User>,
     ) {
-        super(tokenEncoder, tokenDecoder);
+        super(tokenVerifier);
     }
 
     create(user: User): Promise<string | User> {
