@@ -1,13 +1,21 @@
-import { IUsersService } from "../../services";
 import { User, Page, PageBuilder } from "../../models";
 import { PaginationInfo } from "../../middlewares";
 import { LoginResponse } from "../../models/_login-response.model";
 import { SequelizeUser } from "../models-impl/_sequelize-user.model";
 import { ICacheService } from "../../services/_cache.service";
+import { AbstractUsersService } from "../../services/_abstract-users-service";
+import { TokenDecoder } from "../../services/_token-decoder";
+import { TokenEncoder } from "../../services/_token-encoder";
 
-export class SequelizeUsersService implements IUsersService {
+export class SequelizeUsersService extends AbstractUsersService {
 
-    constructor(private cache: ICacheService) { }
+    constructor(
+        private cache: ICacheService,
+        public tokenEncoder: TokenEncoder<User>,
+        public tokenDecoder: TokenDecoder<User>
+    ) {
+        super(tokenEncoder, tokenDecoder);
+    }
 
     create(user: User): Promise<string | User> {
         try {
@@ -32,14 +40,6 @@ export class SequelizeUsersService implements IUsersService {
         } catch (err) {
             return Promise.reject(err);
         }
-    }
-
-    jwtEncode(user: User): Promise<string> {
-        throw new Error("Method not implemented.");
-    }
-
-    jwtDecode(token: string): Promise<User | null> {
-        throw new Error("Method not implemented.");
     }
 
     findById(id: string | number): Promise<User | null> {
