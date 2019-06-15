@@ -12,6 +12,10 @@ export interface IUsersService {
     jwtDecode(token: string): Promise<User|null>;
     findById(id: string|number): Promise<User|null>;
     findPage(pageInfo: PaginationInfo): Promise<Page<User>>;
-    login(loginId: string, password: string, validator: (hash: string, pwd: string) => boolean): Promise<LoginResponse>;
+    login(
+        loginId: string,
+        password: string,
+        validator: (hash: string, pwd: string) => Promise<boolean>
+    ): Promise<LoginResponse>;
     logout(userId: string): Promise<boolean>;
 }

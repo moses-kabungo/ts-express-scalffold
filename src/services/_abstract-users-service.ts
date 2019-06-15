@@ -31,7 +31,11 @@ export abstract class AbstractUsersService implements IUsersService {
 
     abstract findPage(pageInfo: PaginationInfo): Promise<Page<User>>;
 
-    abstract login(loginId: string, password: string, validator: (hash: string, pwd: string) => boolean): Promise<LoginResponse>;
+    abstract login(
+        loginId: string,
+        password: string,
+        validator: (hash: string, pwd: string) => Promise<boolean>
+    ): Promise<LoginResponse>;
 
     abstract logout(userId: string): Promise<boolean>;
 }
