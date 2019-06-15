@@ -7,20 +7,20 @@ const configs: DbConfig = {
     'development': {
         database: process.env.DEV_DB_NAME,
         dialect:  process.env.DEV_DB_DIALECT as SequelizeOptions["dialect"],
-        username: process.env.DEV_DB_USERNAME,
-        password: process.env.DEV_DB_PASSWORD
+        username: process.env.DEV_DB_USER,
+        password: process.env.DEV_DB_PASS
     },
     'production': {
         database: process.env.DB_NAME,
         dialect:  process.env.DB_DIALECT as SequelizeOptions["dialect"],
-        username: process.env.DB_USERNAME,
-        password: process.env.DB_PASSWORD
+        username: process.env.DB_USER,
+        password: process.env.DB_PASS
     },
     'test': {
         database: process.env.CI_DB_NAME,
         dialect:  process.env.CI_DB_DIALECT as SequelizeOptions["dialect"],
-        username: process.env.CI_DB_USERNAME,
-        password: process.env.CI_DB_PASSWORD
+        username: process.env.CI_DB_USER,
+        password: process.env.CI_DB_PASS
     }
 };
 
