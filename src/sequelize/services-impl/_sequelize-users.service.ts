@@ -1,6 +1,6 @@
 import { User, Page, PageBuilder } from "../../models";
 import { PaginationInfo } from "../../middlewares";
-import { LoginResponse } from "../../models/_login-response.model";
+import { LoginResponse, LoginFail } from "../../models/_login-response.model";
 import { SequelizeUser } from "../models-impl/_sequelize-user.model";
 import { ICacheService } from "../../services/_cache.service";
 import { AbstractUsersService } from "../../services/_abstract-users-service";
@@ -69,17 +69,19 @@ export class SequelizeUsersService extends AbstractUsersService {
     async login(
         loginId: string,
         password: string,
-        validator: (hash: string, pwd: string) => boolean): Promise<LoginResponse> {
+        validator: (hash: string, pwd: string) => Promise<boolean>
+    ): Promise<LoginResponse> {
         try {
             const user = await SequelizeUser.findOne({
                 where: { email: loginId }
             });
             // Reject because we couldn't find record.
             if (user == null) {
-                return Promise.reject(new Error("User not found."));
+                return Promise.reject(new LoginFail('Account not found. `' + loginId + '`', 404));
             }
             // check if password is valid
-            if (validator(user.password, password)) {
+            const isValid = await validator(user.password, password);
+            if (isValid) {
                 const accessToken = await this.jwtEncode(user);
                 await this.cache.set('' + user.id, user);
                 return Promise.resolve({
@@ -87,7 +89,7 @@ export class SequelizeUsersService extends AbstractUsersService {
                 });
             }
             // reject because password is invalid
-            return Promise.reject(new Error("Invalid password"));
+            return Promise.reject(new LoginFail('Invalid password.', 403));
         } catch (err) {
             return Promise.reject(err);
         }
