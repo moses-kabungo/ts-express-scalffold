@@ -1,68 +1,25 @@
-import { User, Page, PageBuilder } from "../../models";
-import { PaginationInfo } from "../../middlewares";
 import { LoginResponse, LoginFail } from "../../models/_login-response.model";
 import { SequelizeUser } from "../models-impl/_sequelize-user.model";
 import { ICacheService } from "../../services/_cache.service";
-import { AbstractUsersService } from "../../services/_abstract-users-service";
-import { TokenDecoder } from "../../services/_token-decoder";
-import { TokenEncoder } from "../../services/_token-encoder";
+import { AuthService } from "../../services/_auth-service";
+import { AbstractCRUDFacade } from "./_abstract-crud-facade";
+import { JwtTokenVerifier } from "./_jwt-token-verifier";
 
-export class SequelizeUsersService extends AbstractUsersService {
+export class SequelizeUsersService extends AbstractCRUDFacade<SequelizeUser> implements AuthService {
 
     constructor(
         private cache: ICacheService,
-        public tokenVerifier: TokenEncoder<User> & TokenDecoder<User>,
+        public tokenVerifier: JwtTokenVerifier,
     ) {
-        super(tokenVerifier);
+        super();
     }
 
-    create(user: User): Promise<string | User> {
-        try {
-            return SequelizeUser.create(user);
-        } catch (err) {
-            return Promise.reject(err);
-        }
+    jwtEncode(user: SequelizeUser): Promise<string> {
+        return this.tokenVerifier.encode(user);
     }
 
-    bulkCreate(users: User[]): Promise<User[]> {
-        try {
-            return SequelizeUser.bulkCreate(
-                users, { returning: true });
-        } catch (err) {
-            return Promise.reject(err);
-        }
-    }
-
-    count(): Promise<number> {
-        try {
-            return SequelizeUser.count();
-        } catch (err) {
-            return Promise.reject(err);
-        }
-    }
-
-    findById(id: string | number): Promise<User | null> {
-        try {
-            return SequelizeUser.findByPk(id);
-        } catch (err) {
-            return Promise.reject(err);
-        }
-    }
-
-    async findPage(pageInfo: PaginationInfo): Promise<Page<User>> {
-        try {
-            const { count, rows } = await SequelizeUser.findAndCountAll({
-                offset: pageInfo.offset,
-                limit: pageInfo.ps
-            });
-            const page = PageBuilder
-                .withPageInfo(pageInfo, rows)
-                .totalCount(count)
-                .build();
-            return Promise.resolve(page);
-        } catch (err) {
-            return Promise.reject(err);
-        }
+    jwtDecode(token: string): Promise<SequelizeUser | null> {
+        return <Promise<SequelizeUser|null>>this.tokenVerifier.decode(token);
     }
 
     async login(
