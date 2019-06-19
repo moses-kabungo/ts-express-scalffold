@@ -7,7 +7,7 @@ export class JwtTokenVerifier implements TokenEncoder<User>, TokenDecoder<User> 
 
     encode(data: User): Promise<string> {
         return Promise.resolve(
-            jwt.sign(data, String(process.env.APP_SECRET)));
+            jwt.sign(JSON.stringify(data), String(process.env.APP_SECRET)));
     }
 
     decode(token: string): Promise<User | null> {
@@ -16,7 +16,7 @@ export class JwtTokenVerifier implements TokenEncoder<User>, TokenDecoder<User> 
                 const opts: jwt.DecodeOptions = {
                     json: true
                 };
-                resolve(<User>jwt.decode(token, opts));
+                resolve(<User | null>JSON.parse(String(jwt.decode(token, opts))));
             } catch (err) {
                 reject(err);
             }

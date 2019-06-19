@@ -40,7 +40,8 @@ export class SequelizeUsersService extends SequelizeCRUDFacade<User> implements 
                 return Promise.reject(new LoginFail('Account not found. `' + loginId + '`', 404));
             }
             // check if password is valid
-            const isValid = await validator((<any>user).password, password);
+            const isValid = await validator(password, (<any>user).password);
+            console.log(isValid);
             if (isValid) {
                 const accessToken = await this.jwtEncode(<any>user);
                 await this.cache.set('' + (<any>user).id, user);
