@@ -1,11 +1,13 @@
 import { LoginResponse, LoginFail } from "../../models/_login-response.model";
-import { SequelizeUser } from "../models-impl/_sequelize-user.model";
 import { ICacheService } from "../../services/_cache.service";
 import { AuthService } from "../../services/_auth-service";
 import { AbstractCRUDFacade } from "./_abstract-crud-facade";
 import { JwtTokenVerifier } from "./_jwt-token-verifier";
+import { User } from "../../models";
 
-export class SequelizeUsersService extends AbstractCRUDFacade<SequelizeUser> implements AuthService {
+import db from '../models-impl';
+
+export class SequelizeUsersService extends AbstractCRUDFacade<User> implements AuthService {
 
     constructor(
         private cache: ICacheService,
@@ -14,12 +16,12 @@ export class SequelizeUsersService extends AbstractCRUDFacade<SequelizeUser> imp
         super();
     }
 
-    jwtEncode(user: SequelizeUser): Promise<string> {
+    jwtEncode(user: User): Promise<string> {
         return this.tokenVerifier.encode(user);
     }
 
-    jwtDecode(token: string): Promise<SequelizeUser | null> {
-        return <Promise<SequelizeUser|null>>this.tokenVerifier.decode(token);
+    jwtDecode(token: string): Promise<User | null> {
+        return <Promise<User|null>>this.tokenVerifier.decode(token);
     }
 
     async login(
@@ -28,7 +30,7 @@ export class SequelizeUsersService extends AbstractCRUDFacade<SequelizeUser> imp
         validator: (hash: string, pwd: string) => Promise<boolean>
     ): Promise<LoginResponse> {
         try {
-            const user = await SequelizeUser.findOne({
+            const user = await db.SequelizeUser.findOne({
                 where: { email: loginId }
             });
             // Reject because we couldn't find record.
@@ -36,10 +38,10 @@ export class SequelizeUsersService extends AbstractCRUDFacade<SequelizeUser> imp
                 return Promise.reject(new LoginFail('Account not found. `' + loginId + '`', 404));
             }
             // check if password is valid
-            const isValid = await validator(user.password, password);
+            const isValid = await validator((<any>user).password, password);
             if (isValid) {
-                const accessToken = await this.jwtEncode(user);
-                await this.cache.set('' + user.id, user);
+                const accessToken = await this.jwtEncode(<any>user);
+                await this.cache.set('' + (<any>user).id, user);
                 return Promise.resolve({
                     accessToken
                 });

@@ -1,24 +1,46 @@
-import { Table, Column, DataType, Unique } from 'sequelize-typescript';
+import { Sequelize, DataTypes } from 'sequelize';
 import { User } from '../../models';
 import { BaseModel } from './_base-model';
 
-@Table({
-    timestamps: true,
-    underscored: true
-})
-export class SequelizeUser extends BaseModel<SequelizeUser> implements User {
-    @Column({
-        type: DataType.INTEGER.UNSIGNED,
-        primaryKey: true,
-        autoIncrement: true,
-    })
-    public id?: number;
-    
-    @Column public name!: string;
-    
-    @Column
-    @Unique
-    public email!: string;
-    
-    @Column public password!: string;
-}
+export const usersMapper = (sequelize: Sequelize): BaseModel<User> => {
+
+    const SequelizeUser = <BaseModel<User>> sequelize.define('users', {
+        id: {
+            type: DataTypes.BIGINT,
+            allowNull: false,
+            primaryKey: true,
+            autoIncrement: true
+        },
+        name: {
+            type: DataTypes.STRING(56),
+            allowNull: false
+        },
+
+        email: {
+            type: DataTypes.STRING(127),
+            allowNull: false,
+            unique: true
+        },
+        password: {
+            type: DataTypes.STRING(127),
+            allowNull: false
+        },
+        created_at: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
+        },
+        updated_at: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
+        }
+    }, {
+        tableName: 'users',
+        timestamps: true,
+        underscored: true
+    });
+
+    return SequelizeUser;
+};
+

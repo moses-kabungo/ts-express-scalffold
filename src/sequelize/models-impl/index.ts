@@ -1,13 +1,18 @@
-import { Sequelize } from 'sequelize-typescript';
-import { SequelizeUser } from './_sequelize-user.model';
+import { Sequelize, Options } from 'sequelize';
+import { usersMapper } from './_sequelize-user.model';
 import { getDbConfig } from '../../config/_db.config';
 import { AppEnv } from '../../config/_env-def.config';
+import { DbInterface } from './_db-interface';
 
-const sequelize = new Sequelize(getDbConfig(process.env.NODE_ENV as AppEnv));
+const opts: Options = getDbConfig(process.env.NODE_ENV as AppEnv);
 
-sequelize.addModels([SequelizeUser]);
+console.log(opts);
 
-export const db = {
+const sequelize = new Sequelize(opts);
+const SequelizeUser = usersMapper(sequelize);
+
+export default <DbInterface>{
     sequelize,
-    Sequelize
+    Sequelize,
+    SequelizeUser
 };

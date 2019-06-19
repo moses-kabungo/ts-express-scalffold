@@ -3,7 +3,7 @@ import * as request from 'supertest';
 import * as bodyParser from 'body-parser';
 
 import { User } from "../src/models";
-import { UsersApi } from '../src/routes';
+import { UsersApi } from '../src/routes/users';
 import { MockUsersService } from './mock-users.service';
 import { ICacheService } from '../src/services/_cache.service';
 import { MockCacheService } from './mock-cache.service';

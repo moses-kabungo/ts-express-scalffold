@@ -1,7 +1,5 @@
-import { Model } from "sequelize-typescript";
+import { Model, BuildOptions } from "sequelize";
 
-export class BaseModel<T> extends Model<T> {
-    constructor(...args: any[]) {
-        super(args);
-    }
-}
+export type BaseModel<T> = typeof Model & {
+    new (values?: object, options?: BuildOptions): T;
+};
