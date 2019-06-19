@@ -1,19 +1,21 @@
+// import * as bcrypt from 'bcrypt';
+
 import { LoginResponse, LoginFail } from "../../models/_login-response.model";
 import { ICacheService } from "../../services/_cache.service";
 import { AuthService } from "../../services/_auth-service";
-import { AbstractCRUDFacade } from "./_abstract-crud-facade";
+import { SequelizeCRUDFacade } from "./_sequelize-crud-facade";
 import { JwtTokenVerifier } from "./_jwt-token-verifier";
 import { User } from "../../models";
 
 import db from '../models-impl';
 
-export class SequelizeUsersService extends AbstractCRUDFacade<User> implements AuthService {
+export class SequelizeUsersService extends SequelizeCRUDFacade<User> implements AuthService {
 
     constructor(
         private cache: ICacheService,
         public tokenVerifier: JwtTokenVerifier,
     ) {
-        super();
+        super(db.SequelizeUser);
     }
 
     jwtEncode(user: User): Promise<string> {
@@ -21,7 +23,7 @@ export class SequelizeUsersService extends AbstractCRUDFacade<User> implements A
     }
 
     jwtDecode(token: string): Promise<User | null> {
-        return <Promise<User|null>>this.tokenVerifier.decode(token);
+        return <Promise<User | null>>this.tokenVerifier.decode(token);
     }
 
     async login(
