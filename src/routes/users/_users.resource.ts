@@ -178,4 +178,17 @@ export class UsersResource {
             next(err);
         }
     }
+
+    async deleteByPk(req: Request, res: Response, next: NextFunction) {
+        const { id } = req.params;
+        try {
+            const affected = await this.usersService.deleteByPk(id);
+            if (!affected) {
+                return res.status(404).json({ error: 'user not found.', args: { id } });
+            }
+            res.json({ successful: true, args: { id } });
+        } catch (err) {
+            next(err);
+        }
+    }
 }

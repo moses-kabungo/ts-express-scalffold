@@ -31,6 +31,8 @@ export class UsersApi {
         users.post('/auth', usersResource.doLogin.bind(usersResource));
         // logout user
         users.post('/:id/logout', usersResource.doLogout.bind(usersResource));
+        // DELETE user
+        users.delete('/:id', usersResource.deleteByPk.bind(usersResource));
         
         return users;
     }
