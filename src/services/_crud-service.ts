@@ -8,6 +8,8 @@ export interface CRUDService<T> {
     findByPk(pk: string | number): Promise<T | null>;
     deleteByPk(pk: string | number): Promise<boolean>;
     updateByPk(pk: string | number, props: {[p: string]: any}[]): Promise<{
-        successful: boolean, args: { [p:string]: any }
+        successful: boolean,
+        args: { [p:string]: any }
     }>;
+    count(): Promise<number>;
 }

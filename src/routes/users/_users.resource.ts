@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { IUsersService } from '../../services';
 import { User } from '../../models';
 import { LoginFail } from '../../models/_login-response.model';
 import { PaginationInfo } from '../../middlewares';
 
 import * as bcrypt from 'bcrypt';
+import { CRUDService } from '../../services/_crud-service';
+import { AuthService } from '../../services/_auth-service';
 
 /**
  * Users resource. 
@@ -21,7 +22,7 @@ export class UsersResource {
      * 
      * @param {IUsersService} usersService user storage service interface. 
      */
-    constructor(private usersService: IUsersService) { }
+    constructor(private usersService: CRUDService<User> & AuthService) { }
 
     /**
      * Create new `User` resource.
@@ -87,7 +88,7 @@ export class UsersResource {
     ) {
         const { id } = req.params;
         try {
-            const user = await this.usersService.findById(id);
+            const user = await this.usersService.findByPk(id);
             if (!user) {
                 return res.status(404).json({
                     error: `No user with such an id. id=${id}`

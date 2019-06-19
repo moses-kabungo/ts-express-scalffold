@@ -2,11 +2,12 @@ import * as jwt from 'jsonwebtoken';
 
 import { User, Page, PageBuilder } from "../src/models";
 import { PaginationInfo } from '../src/middlewares/_paginator.middleware';
-import { IUsersService } from "../src/services";
-import { ICacheService } from "../src/services/_cache.service";
 import { LoginResponse, LoginFail } from "../src/models/_login-response.model";
+import { AuthService } from '../src/services/_auth-service';
+import { CRUDService } from '../src/services/_crud-service';
+import { ICacheService } from '../src/services';
 
-export class MockUsersService implements IUsersService {
+export class MockUsersService implements CRUDService<User>, AuthService {
 
     public users: Map<string, User>;
 
@@ -18,7 +19,7 @@ export class MockUsersService implements IUsersService {
         return Promise.resolve(this.users.size);
     }
 
-    bulkCreate(users: User[]): Promise<(string|User)[]> {
+    bulkCreate(users: User[]): Promise<User[]> {
         const result = Promise.resolve(users.map(user => {
             this.users.set(String(user.id), user);
             return user;
@@ -31,8 +32,15 @@ export class MockUsersService implements IUsersService {
         this.users.set(String(user.id), user);
         return Promise.resolve(user);
     }
+    
+    deleteByPk(pk: string | number): Promise<boolean> {
+        throw new Error("Method not implemented.");
+    }
+    updateByPk(pk: string | number, props: { [p: string]: any; }[]): Promise<{ successful: boolean; args: { [p: string]: any; }; }> {
+        throw new Error("Method not implemented.");
+    }
 
-    findById(id: string): Promise<User | null> {
+    findByPk(id: string): Promise<User | null> {
         const exists = this.users.has(id);
         return exists
             ? Promise.resolve(this.users.get(id) as User)
@@ -54,7 +62,7 @@ export class MockUsersService implements IUsersService {
             const data: { id: string } | null = jwt.decode(token) as any;
             if (data == null)
                 reject(null);
-            return this.findById(data!.id);
+            return this.findByPk(data!.id);
         });
     }
 

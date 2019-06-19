@@ -2,15 +2,16 @@ import * as express from 'express';
 import * as request from 'supertest';
 import * as bodyParser from 'body-parser';
 
-import { IUsersService } from "../src/services";
 import { User } from "../src/models";
 import { UsersApi } from '../src/routes';
 import { MockUsersService } from './mock-users.service';
 import { ICacheService } from '../src/services/_cache.service';
 import { MockCacheService } from './mock-cache.service';
+import { CRUDService } from '../src/services/_crud-service';
+import { AuthService } from '../src/services/_auth-service';
 
 describe('Mock bulk create users', () => {
-    let usersService: IUsersService;
+    let usersService: CRUDService<User> & AuthService;
     let cacheService: ICacheService;
     const app = express();
     const users: User[] = [{

@@ -1,15 +1,17 @@
 import { Router } from 'express';
 
 import { UsersResource } from './_users.resource';
-import { IUsersService } from '../../services';
 import { paginator } from '../../middlewares';
+import { CRUDService } from '../../services/_crud-service';
+import { User } from '../../models';
+import { AuthService } from '../../services/_auth-service';
 
 
 const users = Router();
 
 export class UsersApi {
 
-    constructor(private usersService: IUsersService) {}
+    constructor(private usersService: CRUDService<User> & AuthService) {}
 
     init() {
         const usersResource = new UsersResource(this.usersService);
