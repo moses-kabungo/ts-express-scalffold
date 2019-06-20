@@ -27,19 +27,22 @@ export const usersMapper = (sequelize: Sequelize): BaseModel<User> => {
             type: DataTypes.STRING(127),
             allowNull: false
         },
-        // created_at: {
-        //     type: DataTypes.DATE,
-        //     allowNull: false,
-        //     defaultValue: sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
-        // },
-        // updated_at: {
-        //     type: DataTypes.DATE,
-        //     allowNull: false,
-        //     defaultValue: sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
-        // }
+        last_seen_at: {
+            type: DataTypes.DATE,
+            allowNull: true
+        },
+        created_at: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
+        },
+        updated_at: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
+        }
     }, {
             tableName: 'users',
-            timestamps: false,
             underscored: true
         });
 
