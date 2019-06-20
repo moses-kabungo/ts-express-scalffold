@@ -55,18 +55,11 @@ export class SequelizeCRUDFacade<T> implements CRUDService<T> {
     }
     
     async updateByPk(
-        props: { [p: string]: any; }, opts: UpdateOptions): Promise<{
-        successful: boolean,
-        args: { [p: string]: any; };
-    }> {
+        props: { [p: string]: any; }, opts: UpdateOptions): Promise<number> {
         try {
-            const [rowsCount, _] = await this.ModelType
+            const [rowsCount] = await this.ModelType
                 .update(props, opts);
-            void(_);
-            return Promise.resolve({
-                successful: rowsCount > 0,
-                args: props
-            });
+            return Promise.resolve(rowsCount);
         } catch (err) {
             return Promise.reject(err);
         }

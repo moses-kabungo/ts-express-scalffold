@@ -7,9 +7,6 @@ export interface CRUDService<T> {
     findPage(opts: object & { pageInfo: PaginationInfo }): Promise<Page<T>>;
     findByPk(pk: string | number, opts?: object): Promise<T | null>;
     deleteByPk(pk: string | number, opts?: object): Promise<boolean>;
-    updateByPk(props: {[p: string]: any}, opts: object): Promise<{
-        successful: boolean,
-        args: { [p:string]: any }
-    }>;
+    updateByPk(props: {[p: string]: any}, opts: object): Promise<number>;
     count(opts?: object): Promise<number>;
 }

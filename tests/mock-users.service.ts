@@ -36,7 +36,7 @@ export class MockUsersService implements CRUDService<User>, AuthService {
     deleteByPk(pk: string | number): Promise<boolean> {
         throw new Error("Method not implemented.");
     }
-    updateByPk(props: { [p: string]: any; }): Promise<{ successful: boolean; args: { [p: string]: any; }; }> {
+    updateByPk(props: { [p: string]: any; }): Promise<number> {
         throw new Error("Method not implemented.");
     }
 

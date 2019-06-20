@@ -181,6 +181,31 @@ export class UsersResource {
         }
     }
 
+    async updateByPk(req: Request, res: Response, next: NextFunction) {
+        const { id } = req.params;
+        const props  = req.body;
+        try {
+            const affectedCnt = await this.usersService
+                .updateByPk(props, { where: { id }});
+            if (affectedCnt === 0) {
+                return res.status(404).json({
+                    error: 'Failed to update user. Either record or requested field does not exist.',
+                    args: {
+                        id,
+                        changes: props
+                    }
+                });
+            }
+
+            res.json({ successful: true, args: {
+                affectedRowsCount: affectedCnt,
+                changes: props
+            }})
+        } catch (err) {
+            next(err);
+        }
+    }
+
     async deleteByPk(req: Request, res: Response, next: NextFunction) {
         const { id } = req.params;
         try {
