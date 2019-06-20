@@ -14,6 +14,7 @@ const payload: User = {
     id: 1,
     name: 'Jason',
     email: 'jason@example.com',
+    require_password_change: false,
     password: 'very-secret'
 };
 

@@ -1,8 +1,8 @@
 import { Sequelize, Options } from 'sequelize';
-import { usersMapper } from './_sequelize-user-model';
+import { usersMapper } from '../models-impl/_sequelize-user-model';
 import { getDbConfig } from '../../config/_db.config';
 import { AppEnv } from '../../config/_env-def.config';
-import { DbInterface } from './_db-interface';
+import { DbInterface } from '../models-impl/_db-interface';
 
 const opts: Options = getDbConfig(process.env.NODE_ENV as AppEnv);
 console.log(opts);

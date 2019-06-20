@@ -24,6 +24,6 @@
   ],
   "include": [
     "src/**/*.ts",
-    "tests/**/*.ts"
+    "tests/**/*.ts", "src/sequelize/migrations/20190620120229-users-create.js", "src/sequelize/config/database.js"
   ]
 }

@@ -1,59 +1,29 @@
 import * as bcrypt from 'bcrypt';
 
-import { Sequelize, DataTypes } from 'sequelize';
+import { Sequelize, ModelOptions } from 'sequelize';
 import { User } from '../../models';
-import { BaseModel } from './_base-model';
+import { userAttributes } from './_user-attrs';
 
 export const usersMapper = (sequelize: Sequelize): BaseModel<User> => {
 
-    const SequelizeUser = <BaseModel<User>>sequelize.define('users', {
-        id: {
-            type: DataTypes.BIGINT,
-            allowNull: false,
-            primaryKey: true,
-            autoIncrement: true
-        },
-        name: {
-            type: DataTypes.STRING(56),
-            allowNull: false
-        },
-
-        email: {
-            type: DataTypes.STRING(127),
-            allowNull: false,
-            unique: true
-        },
-        password: {
-            type: DataTypes.STRING(127),
-            allowNull: false
-        },
-        last_seen_at: {
-            type: DataTypes.DATE,
-            allowNull: true
-        },
-        created_at: {
-            type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
-        },
-        updated_at: {
-            type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
+    const modelOptions: ModelOptions = {
+        tableName: 'users',
+        underscored: true,
+        defaultScope: {
+            attributes: { exclude: [ 'password' ] }
         }
-    }, {
-            tableName: 'users',
-            underscored: true
-        });
+    }
 
-    SequelizeUser.beforeCreate((attributes, options) => {
+    const SequelizeUser = <BaseModel<User>>sequelize
+        .define('users', userAttributes(sequelize), modelOptions);
+
+    SequelizeUser.beforeCreate((attributes) => {
         return bcrypt.hash((<any>attributes).password, 12)
             .then(hash => {
                 (<any>attributes).password = hash;
             })
             .catch(err => console.error(err));
-    })
+    });
 
     return SequelizeUser;
 };
-

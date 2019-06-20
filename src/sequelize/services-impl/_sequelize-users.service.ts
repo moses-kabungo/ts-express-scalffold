@@ -32,8 +32,11 @@ export class SequelizeUsersService extends SequelizeCRUDFacade<User> implements 
         validator: (hash: string, pwd: string) => Promise<boolean>
     ): Promise<LoginResponse> {
         try {
+            // utilize transaction
+            const transaction = await db.sequelize.transaction();
+
             const user = await db.SequelizeUser.findOne({
-                where: { email: loginId }
+                where: { email: loginId }, transaction
             });
             // Reject because we couldn't find record.
             if (user == null) {
@@ -45,6 +48,16 @@ export class SequelizeUsersService extends SequelizeCRUDFacade<User> implements 
             if (isValid) {
                 const accessToken = await this.jwtEncode(<any>user);
                 await this.cache.set('' + (<any>user).id, user);
+                await this.updateByPk({
+                    last_seen_at: db.Sequelize.fn('NOW')
+                },
+                {
+                    where: {
+                        id: (<any>user).id
+                    },
+                    transaction
+                });
+                await transaction.commit();
                 return Promise.resolve({
                     accessToken
                 });

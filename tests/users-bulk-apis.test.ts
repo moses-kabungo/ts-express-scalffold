@@ -18,52 +18,62 @@ describe('Mock bulk create users', () => {
         id: 2,
         name: 'Sally',
         email: 'sally@example.com',
-        password: 'sally1990'
+        password: 'sally1990',
+        require_password_change: false,
     }, {
         id: 3,
         name: 'Doto',
         email: 'doto@example.com',
-        password: 'doto1998'
+        password: 'doto1998',
+        require_password_change: false,
     }, {
         id: 4,
         name: 'Tom',
         email: 'tom@example.com',
-        password: 'tom2001'
+        password: 'tom2001',
+        require_password_change: false,
     }, {
         id: 5,
         name: 'Sembe',
         email: 'sembe@example.com',
-        password: 'sembe1990'
+        password: 'sembe1990',
+        require_password_change: false,
     }, {
         id: 6,
         name: 'Diana',
         email: 'diana@example.com',
-        password: 'diana1990'
+        password: 'diana1990',
+        require_password_change: false,
     }, {
         id: 7,
         name: 'Cece',
         email: 'cece@example.com',
-        password: 'cece1990'
+        password: 'cece1990',
+        require_password_change: false,
     }, {
         id: 8,
         name: 'Kiboko',
         email: 'kiboko@example.com',
-        password: 'kiboko1990'
+        password: 'kiboko1990',
+        require_password_change: false,
     }, {
         id: 9,
         name: 'Namba 1',
         email: 'namba@example.com',
-        password: 'namba1990'
+        password: 'namba1990',
+        require_password_change: false,
     }, {
         id: 10,
         name: 'Ombeni',
         email: 'ombeni@example.com',
-        password: 'ombeni1990'
+        password: 'ombeni1990',
+        require_password_change: false,
     }, {
         id: 11,
         name: 'Mombeki',
         email: 'mombeki@example.com',
-        password: 'mombeki1990'
+        password: 'mombeki1990',
+        require_password_change: false,
     }];
 
     // void(users);

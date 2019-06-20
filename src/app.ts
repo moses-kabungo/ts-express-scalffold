@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import http from 'http';
 
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import * as bodyParser from 'body-parser';
 
 import { api } from './routes';
@@ -34,6 +34,23 @@ app.use((req, _, next) => {
 });
 
 app.use('/api', api(cacheService, tokenVerifier));
+
+// Handle 404 errors
+app.all('*', function(req, res){
+    res.status(404).json({
+        error: 'Resource Not Found.',
+        args: {
+            method: req.method,
+            url: req.url
+        }
+    });
+});
+
+// Handle 500 errors
+app.use(function (err: Error, req: Request, res: Response, next: NextFunction) {
+    console.error(err.stack);
+    res.status(500).json({ error: err.message });
+})
 
 const server = http.createServer(app);
 server.listen(app.get('PORT'), () => {

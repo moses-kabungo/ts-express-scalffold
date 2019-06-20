@@ -147,10 +147,12 @@ export class UsersResource {
      * process errors
      */
     async getPage(req: Request, res: Response, next: NextFunction) {
-        const paginationInfo: PaginationInfo = req.query.paginationInfo;
+        const pageInfo: PaginationInfo = req.query.paginationInfo;
         try {
             const page = await this.usersService
-                .findPage(paginationInfo);
+                .findPage({
+                    pageInfo,
+                });
             res.json(page);
         } catch (err) {
             console.error(err);
@@ -182,11 +184,11 @@ export class UsersResource {
     async deleteByPk(req: Request, res: Response, next: NextFunction) {
         const { id } = req.params;
         try {
-            const affected = await this.usersService.deleteByPk(id);
-            if (!affected) {
+            const successful = await this.usersService.deleteByPk(id);
+            if (!successful) {
                 return res.status(404).json({ error: 'user not found.', args: { id } });
             }
-            res.json({ successful: true, args: { id } });
+            res.json({ successful, args: { id }});
         } catch (err) {
             next(err);
         }

@@ -36,7 +36,7 @@ export class MockUsersService implements CRUDService<User>, AuthService {
     deleteByPk(pk: string | number): Promise<boolean> {
         throw new Error("Method not implemented.");
     }
-    updateByPk(pk: string | number, props: { [p: string]: any; }[]): Promise<{ successful: boolean; args: { [p: string]: any; }; }> {
+    updateByPk(props: { [p: string]: any; }): Promise<{ successful: boolean; args: { [p: string]: any; }; }> {
         throw new Error("Method not implemented.");
     }
 
@@ -106,14 +106,14 @@ export class MockUsersService implements CRUDService<User>, AuthService {
         return this.cacheService.delete(userId);
     }
 
-    findPage(pageInfo: PaginationInfo): Promise<Page<User>> {
+    findPage(data: { pageInfo: PaginationInfo }): Promise<Page<User>> {
         return this.count().then(totalCount => {
 
             let items: User[] = Array.from(this.users.values());
             // sort if necessary
-            if (pageInfo.sortBy && pageInfo.sortOrder) {
+            if (data.pageInfo.sortBy && data.pageInfo.sortOrder) {
                 items = items.sort((user1, user2) => {
-                    if (pageInfo.sortOrder === 'asc') {
+                    if (data.pageInfo.sortOrder === 'asc') {
                         if (user1.name < user2.name) {
                             return -1;
                         }
@@ -138,10 +138,10 @@ export class MockUsersService implements CRUDService<User>, AuthService {
             }
 
             const ret: User[] = items
-                .slice(pageInfo.offset, pageInfo.ps);
+                .slice(data.pageInfo.offset, data.pageInfo.ps);
 
             const usersPage: Page<User> = PageBuilder
-                .withPageInfo(pageInfo, ret)
+                .withPageInfo(data.pageInfo, ret)
                 .totalCount(totalCount)
                 .build();
             return usersPage;

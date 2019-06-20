@@ -3,10 +3,9 @@ import { CRUDService } from '../../services/_crud-service';
 import { PaginationInfo } from '../../middlewares';
 import { Page, PageBuilder } from '../../models';
 
-import { BaseModel } from '../models-impl/_base-model';
 import { CreateOptions, FindAndCountOptions, DestroyOptions, UpdateOptions } from 'sequelize/types';
-import { FindOptions } from 'sequelize';
 import { CountOptions } from 'sequelize';
+import { Transaction } from 'sequelize';
 
 export class SequelizeCRUDFacade<T> implements CRUDService<T> {
 
@@ -28,12 +27,12 @@ export class SequelizeCRUDFacade<T> implements CRUDService<T> {
         return <Promise<T[]>>this.ModelType.bulkCreate(<Object[]>items, opts);
     }
     
-    async findPage(pageInfo: PaginationInfo, opts?: FindAndCountOptions): Promise<Page<T>> {
+    async findPage(opts: FindAndCountOptions & { pageInfo: PaginationInfo }): Promise<Page<T>> {
         try {
             const { rows, count } = await this.ModelType.findAndCountAll({
-                offset: pageInfo.offset, limit: pageInfo.ps, ...opts
+                offset: opts.offset, limit: opts.limit
             });
-            const page = PageBuilder.withPageInfo(pageInfo, rows)
+            const page = PageBuilder.withPageInfo(opts.pageInfo, rows)
                 .totalCount(count)
                 .build();
             return <Promise<Page<T>>><unknown>Promise.resolve(page);
@@ -42,27 +41,27 @@ export class SequelizeCRUDFacade<T> implements CRUDService<T> {
         }
     }
     
-    async findByPk(pk: string | number, opts?: FindOptions): Promise<T | null> {
+    async findByPk(pk: string | number, opts?: { transaction: Transaction }): Promise<T | null> {
         return <Promise<T | null>>this.ModelType.findByPk(pk, opts);
     }
     
-    async deleteByPk(pk: string | number, opts?: DestroyOptions): Promise<boolean> {
+    async deleteByPk(pk: string | number, opts: DestroyOptions): Promise<boolean> {
         try {
-            const rowsCount = await this.ModelType.destroy({ where: { id: pk }, ...opts });
+            const rowsCount = await this.ModelType.destroy(opts);
             return Promise.resolve( rowsCount > 0 );
         } catch (err) {
             return Promise.reject(err);
         }
     }
     
-    async updateByPk(pk: string | number,
-        props: { [p: string]: any; }[], opts?: UpdateOptions): Promise<{
+    async updateByPk(
+        props: { [p: string]: any; }, opts: UpdateOptions): Promise<{
         successful: boolean,
         args: { [p: string]: any; };
     }> {
         try {
             const [rowsCount, _] = await this.ModelType
-                .update(props, { where: { id: pk }, ...opts });
+                .update(props, opts);
             void(_);
             return Promise.resolve({
                 successful: rowsCount > 0,
