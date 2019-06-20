@@ -11,13 +11,11 @@ import { JwtTokenVerifier } from './sequelize/services-impl/_jwt-token-verifier'
 
 // load variables
 const res = dotenv.config({
-    debug: true
+    debug: parseInt(process.env.DEBUG || '0') === 1
 });
 
 if (res.error) {
     throw res.error;
-} else {
-    console.log(res.parsed);
 }
 
 const app = express();
@@ -30,11 +28,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const cacheService = new RedisCacheService({});
 const tokenVerifier = new JwtTokenVerifier();
 
-// initialize models
-import('./sequelize/models-impl').then(_ => {
-    console.log("Initialized Database");
-});
-
 app.use((req, _, next) => {
     console.log(req.method + ' ' + req.url);
     next();
@@ -44,5 +37,5 @@ app.use('/api', api(cacheService, tokenVerifier));
 
 const server = http.createServer(app);
 server.listen(app.get('PORT'), () => {
-    console.log('Server is listening port %s...', app.get('PORT'))
+    console.log('Server is listening on port %s...', app.get('PORT'))
 });

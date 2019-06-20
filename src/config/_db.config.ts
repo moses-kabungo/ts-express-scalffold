@@ -6,10 +6,10 @@ export type DbConfig = {[key in AppEnv]: Options};
 
 const configs: DbConfig = {
     'development': {
-        database: process.env.DEV_DB_NAME || 'vicoba',
-        dialect:  'postgres',
-        username: process.env.DEV_DB_USER || 'postgres',
-        password: process.env.DEV_DB_PASS || 'root'
+        database: process.env.DEV_DB_NAME,
+        dialect:  process.env.DEV_DB_DIALECT as Options["dialect"],
+        username: process.env.DEV_DB_USER,
+        password: process.env.DEV_DB_PASS
     },
     'production': {
         database: process.env.DB_NAME,
@@ -26,6 +26,5 @@ const configs: DbConfig = {
 };
 
 export function getDbConfig(appEnv: AppEnv) {
-    console.log(appEnv);
-    return configs['development'];
+    return configs[appEnv];
 }
