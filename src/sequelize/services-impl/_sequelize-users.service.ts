@@ -6,6 +6,7 @@ import { AuthService } from "../../services/_auth-service";
 import { SequelizeCRUDFacade } from "./_sequelize-crud-facade";
 import { JwtTokenVerifier } from "./_jwt-token-verifier";
 import { User } from "../../models";
+import { QueryTypes } from 'sequelize';
 
 import db from '../models-impl';
 
@@ -35,16 +36,19 @@ export class SequelizeUsersService extends SequelizeCRUDFacade<User> implements 
             // utilize transaction
             const transaction = await db.sequelize.transaction();
 
-            const user = await db.SequelizeUser.findOne({
-                where: { email: loginId }, transaction
+            const [ user ] = await db.sequelize.query('SELECT * FROM users WHERE email=? LIMIT 1', {
+                replacements: [ loginId ],
+                transaction,
+                type: QueryTypes.SELECT
             });
+
             // Reject because we couldn't find record.
             if (user == null) {
                 return Promise.reject(new LoginFail('Account not found. `' + loginId + '`', 404));
             }
             // check if password is valid
             const isValid = await validator(password, (<any>user).password);
-            console.log(isValid);
+
             if (isValid) {
                 const accessToken = await this.jwtEncode(<any>user);
                 await this.cache.set('' + (<any>user).id, user);
