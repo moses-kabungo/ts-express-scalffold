@@ -2,6 +2,7 @@
 
 const NodemonPlugin = require('nodemon-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
+const Dotenv = require('dotenv-webpack');
 const path = require('path');
 
 module.exports = (env = {}) => {
@@ -21,7 +22,9 @@ module.exports = (env = {}) => {
                 { test: /\.ts$/, use: 'ts-loader' }
             ]
         },
-        plugins: []
+        plugins: [
+            new Dotenv()
+        ]
     };
 
     if (env.nodemon) {
